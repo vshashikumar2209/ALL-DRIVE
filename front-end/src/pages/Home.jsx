@@ -6,10 +6,13 @@ import { useRef } from 'react';
 
 const Home = () => {
     const API = import.meta.env.VITE_API_BASE_URL;
+    // const API = "http://localhost:4000";
     const [files, setFiles] = useState([]);
     const [uploading, setUploading] = useState(false);
     const [status, setStatus] = useState('');
     const token = localStorage.getItem('token');
+    console.log("API =", API);
+    console.log("Token =", token);
     
     // Auth & Layout States
     const [user, setUser] = useState(() => {
@@ -161,20 +164,14 @@ const Home = () => {
 
 
     const fetchFiles = async () => {
-        try {
-            const res = await fetch(`${API}/api/files?path=${encodeURIComponent(currentPath || '')}`, {
-                headers: { 'Authorization': 'Bearer ' + token },
-                credentials: 'include',
-            });
+        const data = await res.json();
+        console.log("Files API Response:", data);
 
-            if (res.status === 401) {
-                handleLogout();
-                return;
-            }
-            const data = await res.json();
-            setFiles(data);
-        } catch (err) {
-            console.error('Error fetching files:', err);
+        if (Array.isArray(data)) {
+        setFiles(data);
+        } else {
+        console.error("Expected array, got:", data);
+        setFiles([]);
         }
     };
 
